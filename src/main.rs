@@ -1,5 +1,5 @@
 use game::Game;
-use sdl2::{self, render::RenderTarget};
+use sdl2::event::Event;
 use std::time;
 
 mod game;
@@ -11,7 +11,7 @@ fn main(){
     let video_subsystem = sdl_context.video().expect("Cannot start video subsystem");
     let mut event_pump = sdl_context.event_pump().expect("Cannot get even pump");
 
-    let mut canvas = video_subsystem.window("rusty snake", 500, 500)
+    let mut canvas = video_subsystem.window("rusty snake", 600, 600)
         .build()
         .expect("Cannot create window")
         .into_canvas()
@@ -22,12 +22,9 @@ fn main(){
     let timer = time::Instant::now();
     let mut last = timer.elapsed();
 
-    let mut r : u8 = 0;
-    let mut g : u8 = 0;
-    let mut b : u8 = 0;
 
-    draw(&mut canvas, sdl2::pixels::Color::RGB(r, g, b));
-    let game = Game::new();
+    draw(&mut canvas, sdl2::pixels::Color::RGB(0, 0, 0));
+    let mut game = Game::new(10,50,5);
 
     loop {
 
@@ -37,29 +34,23 @@ fn main(){
 
             last = now;
 
-            for row in game.fields.iter(){
-                for rect in row.iter(){
-
-                    r = r.wrapping_add(5);
-                    g = g.wrapping_add(10);
-                    b = b.wrapping_add(2);
-                    canvas.set_draw_color(sdl2::pixels::Color::RGB(r, g, b));
-                    canvas.fill_rect(*rect).unwrap();
-                    canvas.present();
-
-                }
+            if game.run() == 0 {
+                panic!("You lost!");
             }
 
-            //draw(&mut canvas, sdl2::pixels::Color::RGB(r, g, b));
+            canvas.present();
+            game.draw(&mut canvas);
             
         }
 
         match event_pump.poll_event() {
-            Some(sdl2::event::Event::Quit{ timestamp: _}) => break,
+            Some(Event::Quit{..}) => break,
+            Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::A),
+            ..}) => game.turn_left(),
+            Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::D),
+            ..}) => game.turn_right(),
             _ => continue
         }
-
-
     }
 
 }
