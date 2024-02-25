@@ -1,5 +1,8 @@
+use game::Game;
 use sdl2::{self, render::RenderTarget};
 use std::time;
+
+mod game;
 
 fn main(){
 
@@ -24,6 +27,7 @@ fn main(){
     let mut b : u8 = 0;
 
     draw(&mut canvas, sdl2::pixels::Color::RGB(r, g, b));
+    let game = Game::new();
 
     loop {
 
@@ -32,11 +36,21 @@ fn main(){
         if (now - last).as_millis() >= 100 {
 
             last = now;
-            r = r.wrapping_add(5);
-            g = g.wrapping_add(10);
-            b = b.wrapping_add(2);
 
-            draw(&mut canvas, sdl2::pixels::Color::RGB(r, g, b));
+            for row in game.fields.iter(){
+                for rect in row.iter(){
+
+                    r = r.wrapping_add(5);
+                    g = g.wrapping_add(10);
+                    b = b.wrapping_add(2);
+                    canvas.set_draw_color(sdl2::pixels::Color::RGB(r, g, b));
+                    canvas.fill_rect(*rect).unwrap();
+                    canvas.present();
+
+                }
+            }
+
+            //draw(&mut canvas, sdl2::pixels::Color::RGB(r, g, b));
             
         }
 
