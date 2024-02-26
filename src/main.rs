@@ -1,6 +1,7 @@
 use game::Game;
 use sdl2::event::Event;
 use std::time;
+use game::snake;
 
 mod game;
 
@@ -11,7 +12,7 @@ fn main(){
     let video_subsystem = sdl_context.video().expect("Cannot start video subsystem");
     let mut event_pump = sdl_context.event_pump().expect("Cannot get even pump");
 
-    let mut canvas = video_subsystem.window("rusty snake", 600, 600)
+    let mut canvas = video_subsystem.window("rusty snake", 1000, 1000)
         .build()
         .expect("Cannot create window")
         .into_canvas()
@@ -24,13 +25,13 @@ fn main(){
 
 
     draw(&mut canvas, sdl2::pixels::Color::RGB(0, 0, 0));
-    let mut game = Game::new(10,50,5);
+    let mut game = Game::new(20,40,1);
 
     loop {
 
         let now = timer.elapsed();
 
-        if (now - last).as_millis() >= 100 {
+        if (now - last).as_millis() >= 200 {
 
             last = now;
 
@@ -46,9 +47,13 @@ fn main(){
         match event_pump.poll_event() {
             Some(Event::Quit{..}) => break,
             Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::A),
-            ..}) => game.turn_left(),
+            ..}) => game.snake.command(snake::Rotation::Left),
             Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::D),
-            ..}) => game.turn_right(),
+            ..}) => game.snake.command(snake::Rotation::Right),
+            Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::W),
+            ..}) => game.snake.command(snake::Rotation::Up),
+            Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::S),
+            ..}) => game.snake.command(snake::Rotation::Down),
             _ => continue
         }
     }

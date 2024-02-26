@@ -1,11 +1,11 @@
 use sdl2::{rect::Rect,render::Canvas};
 
 use self::snake::Snake;
-mod snake;
+pub mod snake;
 
 pub struct Game{
     pub fields : Vec<Vec<Rect>>,
-    snake : Snake,
+    pub snake : Snake,
     rgb : (u8,u8,u8),
     map_size : usize,
 }
@@ -32,14 +32,6 @@ impl Game {
             map_size
         }
     
-    }
-
-    pub fn turn_left(&mut self){
-        self.snake.turn_left();
-    }
-
-    pub fn turn_right(&mut self){
-        self.snake.turn_right();
     }
 
     pub fn run(&mut self) -> i32{
