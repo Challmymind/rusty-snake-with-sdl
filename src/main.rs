@@ -5,6 +5,9 @@ use game::snake;
 
 mod game;
 
+const SCREEN_AXIS : u32 = 1000;
+const FIELDS_DENSITY : u32 = 50;
+
 fn main(){
 
     // Rust bindings call implicitly SDL_QUIT after droping context
@@ -12,7 +15,7 @@ fn main(){
     let video_subsystem = sdl_context.video().expect("Cannot start video subsystem");
     let mut event_pump = sdl_context.event_pump().expect("Cannot get even pump");
 
-    let mut canvas = video_subsystem.window("rusty snake", 1000, 1000)
+    let mut canvas = video_subsystem.window("rusty snake", SCREEN_AXIS, SCREEN_AXIS)
         .build()
         .expect("Cannot create window")
         .into_canvas()
@@ -25,13 +28,13 @@ fn main(){
 
 
     draw(&mut canvas, sdl2::pixels::Color::RGB(0, 0, 0));
-    let mut game = Game::new(20,40,1);
+    let mut game = Game::new(SCREEN_AXIS,FIELDS_DENSITY);
 
     loop {
 
         let now = timer.elapsed();
 
-        if (now - last).as_millis() >= 200 {
+        if (now - last).as_millis() >= 100 {
 
             last = now;
 

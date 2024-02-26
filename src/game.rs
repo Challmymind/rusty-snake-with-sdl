@@ -3,25 +3,28 @@ use sdl2::{rect::Rect,render::Canvas};
 use self::snake::Snake;
 pub mod snake;
 
+const GAP_SIZE : u32 = 1;
+
 pub struct Game{
     pub fields : Vec<Vec<Rect>>,
     pub snake : Snake,
     rgb : (u8,u8,u8),
-    map_size : usize,
+    map_size : u32,
 }
 
 impl Game {
 
-    pub fn new(map_size : usize, field_size : usize, fields_gap : usize) -> Self{
+    pub fn new(axis_len : u32, fields_dens : u32) -> Self{
 
-        let mut fields = vec![Vec::new(); map_size];
+        let mut fields = vec![Vec::new(); fields_dens as usize];
+        let field_axis = (axis_len - fields_dens + GAP_SIZE)/fields_dens;
 
         for (i,row) in fields.iter_mut().enumerate() {
-            for n in 0..map_size{
-                row.push(Rect::new((i*(field_size+fields_gap)) as i32, 
-                                   (n*(field_size+fields_gap)) as i32, 
-                                   field_size as u32, 
-                                   field_size as u32));
+            for n in 0..fields_dens{
+                row.push(Rect::new((i*(field_axis + GAP_SIZE) as usize) as i32, 
+                                   (n*(field_axis + GAP_SIZE)) as i32, 
+                                   field_axis, 
+                                   field_axis));
             }
         }
 
@@ -29,7 +32,7 @@ impl Game {
             fields,
             snake : Snake::new(),
             rgb : (0,0,0),
-            map_size
+            map_size : fields_dens
         }
     
     }
