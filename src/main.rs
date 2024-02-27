@@ -1,7 +1,6 @@
 use game::Game;
 use sdl2::event::Event;
 use std::time;
-use game::snake;
 
 mod game;
 
@@ -13,7 +12,7 @@ fn main(){
     // Rust bindings call implicitly SDL_QUIT after droping context
     let sdl_context = sdl2::init().expect("Cannot initialize SDL library");
     let video_subsystem = sdl_context.video().expect("Cannot start video subsystem");
-    let mut event_pump = sdl_context.event_pump().expect("Cannot get even pump");
+    let mut event_pump = sdl_context.event_pump().expect("Cannot get event pump");
 
     let mut canvas = video_subsystem.window("rusty snake", SCREEN_AXIS, SCREEN_AXIS)
         .build()
@@ -39,7 +38,8 @@ fn main(){
             last = now;
 
             if game.run() == 0 {
-                panic!("You lost!");
+                print!("Your score: {}\n", game.score());
+                return;
             }
 
             canvas.present();
@@ -49,14 +49,8 @@ fn main(){
 
         match event_pump.poll_event() {
             Some(Event::Quit{..}) => break,
-            Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::A),
-            ..}) => game.snake.command(snake::Rotation::Left),
-            Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::D),
-            ..}) => game.snake.command(snake::Rotation::Right),
-            Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::W),
-            ..}) => game.snake.command(snake::Rotation::Up),
-            Some(Event::KeyDown { keycode : Some(sdl2::keyboard::Keycode::S),
-            ..}) => game.snake.command(snake::Rotation::Down),
+            Some(Event::KeyDown { keycode : Some(x),
+            ..}) => game.send_command(x),
             _ => continue
         }
     }
