@@ -1,7 +1,9 @@
 use sdl2::{rect::Rect,render::Canvas, keyboard::Keycode};
 
-use self::snake::Snake;
+use self::{snake::Snake, map::Map, draw::Draw};
 mod snake;
+pub mod draw;
+pub mod map;
 
 const GAP_SIZE : u32 = 1;
 
@@ -9,8 +11,7 @@ pub struct Game{
     fields : Vec<Rect>,
     snake : Snake,
     rgb : (u8,u8,u8),
-    map_size : u32,
-
+    map : Map,
 }
 
 impl Game {
@@ -31,11 +32,13 @@ impl Game {
             }
         }
 
+        let fields_dens = fields_dens as i32;
+
         Game{
             fields,
             snake : Snake::new(),
             rgb : (0,0,0),
-            map_size : fields_dens
+            map : Map::new(fields_dens, fields_dens),
         }
     
     }
@@ -53,23 +56,13 @@ impl Game {
 
     }
 
-    pub fn run(&mut self) -> i32{
-        self.snake.run();
-        let head = self.snake.segments.first().unwrap().clone();
-        let x = head.0;
-        let y = head.1;
-        if x < 0 || x >= self.map_size as isize{
-            return 0;
-        }
-        if y < 0 || y >= self.map_size as isize{
-            return 0;
-        }
-        1
+    pub fn run(&mut self) -> bool{
+        return self.snake.run(&self.map);
     }
 
-    pub fn score(&self) -> u32{
-        return self.snake.segments.len() as u32;
-    }
+    //pub fn score(&self) -> u32{
+    //    return self.snake.segments.len() as u32;
+    //}
 
     pub fn draw<T : sdl2::render::RenderTarget>(&mut self, 
                                                 canvas : &mut Canvas<T>)
@@ -80,9 +73,15 @@ impl Game {
                 self.rgb.0, 
                 self.rgb.1,
                 self.rgb.2));
-        for segment in self.snake.segments.iter(){
-            canvas.fill_rect(self.fields[
-                             segment.1 as usize + (segment.0 as usize * self.map_size as usize) as usize]).unwrap();
+        for segment in self.snake.get_drawable().iter(){
+            let field = segment.1 + (segment.0 * self.map.size.0);
+            if let Some(i) = self.fields.get(field as usize){
+                canvas.fill_rect(*i).unwrap();
+            }
+        }
+        let field = self.map.fruit.1 + (self.map.fruit.0 * self.map.size.0);
+        if let Some(i) = self.fields.get(field as usize){
+            canvas.fill_rect(*i).unwrap();
         }
         self.rgb.0 = self.rgb.0.wrapping_add(5);
         self.rgb.1 = self.rgb.1.wrapping_add(10);

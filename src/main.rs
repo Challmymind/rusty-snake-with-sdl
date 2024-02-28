@@ -25,8 +25,6 @@ fn main(){
     let timer = time::Instant::now();
     let mut last = timer.elapsed();
 
-
-    draw(&mut canvas, sdl2::pixels::Color::RGB(0, 0, 0));
     let mut game = Game::new(SCREEN_AXIS,FIELDS_DENSITY);
 
     loop {
@@ -37,8 +35,8 @@ fn main(){
 
             last = now;
 
-            if game.run() == 0 {
-                print!("Your score: {}\n", game.score());
+            if !game.run() {
+                //print!("Your score: {}\n", game.score());
                 return;
             }
 
@@ -55,14 +53,4 @@ fn main(){
         }
     }
 
-}
-
-pub fn draw<T : sdl2::render::RenderTarget>(
-    canva : &mut sdl2::render::Canvas<T>, 
-    color : sdl2::pixels::Color
-    )
-{
-    canva.set_draw_color(color);
-    canva.clear();
-    canva.present();
 }
