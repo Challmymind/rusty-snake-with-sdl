@@ -36,14 +36,14 @@ fn main(){
             last = now;
 
             if !game.run() {
-                //print!("Your score: {}\n", game.score());
+                print!("Your score: {}\n", game.score());
                 return;
             }
-
-            canvas.present();
-            game.draw(&mut canvas);
             
         }
+
+        game.draw(&mut canvas);
+        canvas.present();
 
         match event_pump.poll_event() {
             Some(Event::Quit{..}) => break,

@@ -39,6 +39,10 @@ impl Snake{
         }
     }
 
+    pub fn score(&self)->usize{
+        return self.segments.len() - 3;
+    }
+
     pub fn run(&mut self, map : &mut Map) -> bool{
 
         let mut head = self.segments.first().unwrap().clone();
