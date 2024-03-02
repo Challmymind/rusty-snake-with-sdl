@@ -1,4 +1,5 @@
-use sdl2::{rect::Rect,render::Canvas, keyboard::Keycode};
+use sdl2::{rect::Rect,render::Canvas, keyboard::Keycode, pixels::Color};
+use noise::{self, NoiseFn};
 
 use self::{snake::Snake, map::Map, draw::Draw};
 mod snake;
@@ -12,6 +13,8 @@ pub struct Game{
     snake : Snake,
     rgb : (u8,u8,u8),
     map : Map,
+    noise : noise::Perlin,
+    step : f64,
 }
 
 impl Game {
@@ -39,6 +42,8 @@ impl Game {
             snake : Snake::new(),
             rgb : (0,0,0),
             map : Map::new(fields_dens, fields_dens),
+            noise : noise::Perlin::new(1),
+            step : 0.,
         }
     
     }
@@ -68,10 +73,28 @@ impl Game {
                                                 canvas : &mut Canvas<T>)
     {
         canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 255, 255));
-        canvas.fill_rects(&self.fields).unwrap();
+        for rect in &self.fields{
+            let x : f64 = (rect.x() as f64 + self.step)/1000.;
+            let y : f64 = (rect.y() as f64 + self.step)/1000.;
+            let perlin = (self.noise.get([x,y]) + 1.) * 10.;
+            match perlin {
+                perlin if perlin < 8. => {
+                    canvas.set_draw_color(Color::RGB(0, 153, 0));
+                },
+                perlin if perlin > 12. => {
+                    canvas.set_draw_color(Color::RGB(0, 255, 0));
+                },
+                _ => {
+                    canvas.set_draw_color(Color::RGB(0, 200, 0));
+                },
+            }
+            canvas.fill_rect(*rect).unwrap();
+
+        }
+        self.step += self.fields.first().unwrap().width() as f64;
         canvas.set_draw_color(sdl2::pixels::Color::RGB(
                 self.rgb.0, 
-                self.rgb.1,
+                0,
                 self.rgb.2));
         for segment in self.snake.get_drawable().iter(){
             let field = segment.1 + (segment.0 * self.map.size.0);
@@ -83,8 +106,7 @@ impl Game {
         if let Some(i) = self.fields.get(field as usize){
             canvas.fill_rect(*i).unwrap();
         }
-        self.rgb.0 = self.rgb.0.wrapping_add(5);
-        self.rgb.1 = self.rgb.1.wrapping_add(10);
-        self.rgb.2 = self.rgb.2.wrapping_add(2);
+        self.rgb.0 = self.rgb.0.wrapping_add(10);
+        self.rgb.2 = self.rgb.2.wrapping_add(5);
     }
 }
