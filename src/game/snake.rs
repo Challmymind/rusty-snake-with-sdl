@@ -1,5 +1,5 @@
 use crate::game::draw::Draw;
-
+use rand::{self, Rng};
 use super::map::Map;
 
 enum Collision{
@@ -39,7 +39,7 @@ impl Snake{
         }
     }
 
-    pub fn run(&mut self, map : &Map) -> bool{
+    pub fn run(&mut self, map : &mut Map) -> bool{
 
         let mut head = self.segments.first().unwrap().clone();
 
@@ -55,14 +55,47 @@ impl Snake{
             Rotation::Right => head.0 += 1,
         };
 
-        match self.check_collision(&head,&map){
+        match self.check_collision(&head,map){
             Collision::Snake => return false,
-            Collision::Fruit => self.r#move(head, true),
+            Collision::Fruit => {
+                self.generate_fruit(map);
+                self.r#move(head, true);
+                },
             Collision::Border => return false,
             Collision::Nothing => self.r#move(head, false),
         }
 
         true
+
+    }
+
+    fn generate_fruit(&self, map : &mut Map){
+
+        let mut rng = rand::thread_rng(); 
+        let mut x = rng.gen_range(0..map.size.0);
+        let mut y = rng.gen_range(0..map.size.0);
+
+        loop {
+            if self.segments.contains(&(x,y)){
+                if x >= map.size.0 - 1{
+                    if y >= map.size.0 - 1{
+                        x = 0;
+                        y = 0;
+                        continue;
+                    }
+                    x = 0;
+                    y += 1;
+                }
+                else {
+                    x += 1;
+                }
+            }
+            else {
+                break;
+            }
+        }
+
+        map.fruit = (x,y);
 
     }
 

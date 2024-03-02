@@ -57,7 +57,7 @@ impl Game {
     }
 
     pub fn run(&mut self) -> bool{
-        return self.snake.run(&self.map);
+        return self.snake.run(&mut self.map);
     }
 
     //pub fn score(&self) -> u32{

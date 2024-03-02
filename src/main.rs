@@ -5,7 +5,7 @@ use std::time;
 mod game;
 
 const SCREEN_AXIS : u32 = 1000;
-const FIELDS_DENSITY : u32 = 50;
+const FIELDS_DENSITY : u32 = 30;
 
 fn main(){
 
@@ -31,7 +31,7 @@ fn main(){
 
         let now = timer.elapsed();
 
-        if (now - last).as_millis() >= 100 {
+        if (now - last).as_millis() >= 110{
 
             last = now;
 
